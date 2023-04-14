@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
+using Xamarin.Forms;
 
 namespace Temperature.ViewModels
 {
@@ -50,21 +51,20 @@ namespace Temperature.ViewModels
 
         async Task ExecuteScanCommand()
         {
-            var LocationPermission = await PermissionHelpers.RequestIfNeeded<Permissions.LocationAlways>();
-            
-            UserDialogsService.ShowLoading("Scan Bluetooth Device", MaskType.Gradient);
-            if (LocationPermission == PermissionStatus.Granted)
+            var permissionResult = await DependencyService.Get<Helpers.IPlatformHelpers>().CheckAndRequestBluetoothPermissions();
+            if (permissionResult != PermissionStatus.Granted)
             {
+                await UserDialogsService.AlertAsync("Permission denied. Not scanning.");
+                AppInfo.ShowSettingsUI();
+            }
+            else
+            {
+                UserDialogsService.ShowLoading("Scan Bluetooth Device", MaskType.Gradient);
                 DeviceList = new List<IDevice>();
                 await _adapterService.StartScanningForDevicesAsync();
                 DeviceList = _adapterService.DiscoveredDevices.ToList();
             }
-            else
-            {
-                await UserDialogsService.AlertAsync("Location Permission is required");
-            }
             UserDialogsService.HideLoading();
-
         }
 
 
@@ -72,18 +72,6 @@ namespace Temperature.ViewModels
 
         public DelegateCommand<IDevice> ItemSelectedCommand =>
             _itemSelectedCommand ?? (_itemSelectedCommand = new DelegateCommand<IDevice>(async (a) => await ExecuteItemSelectedCommand(a)));
-
-        //private DelegateCommand _refreshCommand;
-
-        //public DelegateCommand RefreshCommand =>
-        //    _refreshCommand ?? (_refreshCommand = new DelegateCommand(async () => await ExecuteRefreshCommand()));
-
-        //private async Task ExecuteRefreshCommand()
-        //{
-        //    IsRefreshing = true;
-        //    await GetBlutoothDevices();
-        //    IsRefreshing = false;
-        //}
 
         private async Task ExecuteItemSelectedCommand(IDevice device)
         {
@@ -115,24 +103,6 @@ namespace Temperature.ViewModels
         public async override void OnAppearing()
         {
             base.OnAppearing();
-
-        }
-
-        private async Task GetBlutoothDevices()
-        {
-            var LocationPermission = await PermissionHelpers.RequestIfNeeded<Permissions.LocationAlways>();
-            if (LocationPermission == PermissionStatus.Granted)
-            {
-                DeviceList = new List<IDevice>();
-
-                await _adapterService.StartScanningForDevicesAsync();
-                _adapterService.DeviceDiscovered += (s, a) => DeviceList.Add(a.Device);
-
-            }
-            else
-            {
-                await UserDialogsService.AlertAsync("Location Permission is required");
-            }
 
         }
     }
