@@ -5,14 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:Yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
     Title="{Binding Title}">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Command="{Binding ScanCommand}" Text="Scan" />
-    </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout VerticalOptions="FillAndExpand">
-            <!--<RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsRefreshing}">
-
-            </RefreshView>-->
+        <StackLayout Margin="15" VerticalOptions="FillAndExpand">
+            <Button Command="{Binding ScanCommand}" Text="Сканировать" />
             <CollectionView
                 x:Name="DeviceListItemName"
                 BackgroundColor="WhiteSmoke"
@@ -33,26 +28,24 @@
                                     Color="DarkGray" />
                             </Yummy:PancakeView.Border>
                             <StackLayout>
-                                <Grid ColumnDefinitions="50*,50*">
+                                <Grid ColumnDefinitions="50*,20*, 10*">
                                     <StackLayout
                                         Grid.Column="0"
                                         HorizontalOptions="Start"
                                         Spacing="0">
-                                        <Label
-                                            FontSize="10"
-                                            Text="Name"
-                                            TextColor="Gray" />
                                         <Label FontSize="14" Text="{Binding Name}" />
                                     </StackLayout>
                                     <StackLayout
                                         Grid.Column="1"
                                         HorizontalOptions="Start"
                                         Spacing="0">
-                                        <Label
-                                            FontSize="10"
-                                            Text="Status"
-                                            TextColor="Gray" />
                                         <Label FontSize="14" Text="{Binding State, Converter={StaticResource DeviceStateConverter}}" />
+                                    </StackLayout>
+                                    <StackLayout
+                                        Grid.Column="2"
+                                        HorizontalOptions="Start"
+                                        Spacing="0">
+                                        <Label FontSize="14" Text="{Binding Rssi, StringFormat='{0:d} dB'}" />
                                     </StackLayout>
                                 </Grid>
                             </StackLayout>

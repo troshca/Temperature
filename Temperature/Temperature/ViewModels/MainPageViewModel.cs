@@ -12,6 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using System;
+using System.Threading;
 
 namespace Temperature.ViewModels
 {
@@ -37,17 +39,11 @@ namespace Temperature.ViewModels
             set { SetProperty(ref _selectedItem, value); }
         }
 
-        //private bool isRefreshing = false;
-
-        //public bool IsRefreshing
-        //{
-        //    get { return isRefreshing; }
-        //    set { SetProperty(ref isRefreshing, value); }
-        //}
-
         private DelegateCommand _scanCommand;
         public DelegateCommand ScanCommand =>
             _scanCommand ?? (_scanCommand = new DelegateCommand(async () => await ExecuteScanCommand()));
+
+        static readonly CancellationTokenSource s_cts = new CancellationTokenSource();
 
         async Task ExecuteScanCommand()
         {
@@ -67,24 +63,55 @@ namespace Temperature.ViewModels
             UserDialogsService.HideLoading();
         }
 
-
         private DelegateCommand<IDevice> _itemSelectedCommand;
 
         public DelegateCommand<IDevice> ItemSelectedCommand =>
-            _itemSelectedCommand ?? (_itemSelectedCommand = new DelegateCommand<IDevice>(async (a) => await ExecuteItemSelectedCommand(a)));
+            _itemSelectedCommand ?? (_itemSelectedCommand = new DelegateCommand<IDevice>((a) => ConnectCommand(a)));
+
+        private void ConnectCommand(IDevice device)
+        {
+            _ = UserDialogs.Instance.Confirm(new ConfirmConfig
+            {
+                Message = "Подключиться? ",
+                OkText = "Да",
+                CancelText = "Отмена",
+                Title = "Подключиться к " + device.Name,
+                OnAction = async (confirmed) => { if (!confirmed) return; else await ExecuteItemSelectedCommand(device); }
+            });
+        }
 
         private async Task ExecuteItemSelectedCommand(IDevice device)
         {
             try
             {
                 UserDialogsService.ShowLoading("Connect To Device", MaskType.Gradient);
+                s_cts.CancelAfter(3500);
+                await _adapterService.DisconnectDeviceAsync(device);
                 await _adapterService.ConnectToDeviceAsync(device);
-                UserDialogsService.HideLoading();
-                await ExecuteScanCommand();
+                var navigationParams = new NavigationParameters
+                {
+                    { "device", device }
+                };
+                var result = await NavigationService.NavigateAsync("NavigationPage/TemperatureSensorPage", navigationParams);
+                //await ExecuteScanCommand();
+            }
+            catch (OperationCanceledException e)
+            {
+
+                UserDialogsService.Alert(e.Message);
             }
             catch (DeviceConnectionException e)
             {
-
+                UserDialogsService.Alert(e.Message);
+            }
+            catch (Exception ex)
+            {
+                UserDialogsService.Alert(ex.Message);
+            }
+            finally
+            {
+                s_cts.Dispose();
+                UserDialogsService.HideLoading();
             }
         }
 

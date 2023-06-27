@@ -44,6 +44,10 @@ namespace Temperature
             containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
             containerRegistry.RegisterInstance(typeof(IUserDialogs), UserDialogs.Instance);
             containerRegistry.Register<IBluetoothService, BluetoothService>();
+
+            containerRegistry.RegisterForNavigation<ServiceListPage, ServiceListPageViewModel>();
+            containerRegistry.RegisterForNavigation<TemperatureSensorPage, TemperatureSensorPageViewModel>();
+
         }
 
         private void SetMainPageFromException(Exception ex)

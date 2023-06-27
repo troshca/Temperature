@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Temperature.Views.TemperatureSensorPage">
+    <ContentPage.Content>
+        <StackLayout Margin="15">
+            <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="10*" />
+            </Grid.RowDefinitions>
+            <StackLayout Grid.Row="1" 
+               VerticalOptions="CenterAndExpand">
+                <Label Text="{Binding Temperature, StringFormat='Температура: {0:0.00}°C'}" FontSize="Large" HorizontalTextAlignment="Center"/>
+                <Label Text="{Binding Humidity, StringFormat='Влажность: {0:d2}%'}" FontSize="Large" HorizontalTextAlignment="Center"/>
+            </StackLayout>
+            <StackLayout Grid.Row="3" Orientation="Horizontal" VerticalOptions="EndAndExpand"  HorizontalOptions="CenterAndExpand">
+                <Button Text="Обновить" Command="{Binding UpdateCommand}" />
+                <Button Text="{Binding UpdateButtonText}" Command="{Binding ToggleUpdatesCommand}" />
+            </StackLayout>
+        </Grid>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
