@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="Temperature.Views.TitlePage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:Yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
+    Title="{Binding Title}">
+    <ContentPage.Content>
+        <StackLayout Margin="15" VerticalOptions="FillAndExpand">
+            <Button Command="{Binding ScanCommand}" Text="Сканировать" />
+            <CollectionView
+                x:Name="DeviceListItemName"
+                BackgroundColor="WhiteSmoke"
+                ItemsSource="{Binding DeviceList}"
+                SelectedItem="{Binding SelectedItem}"
+                SelectionChangedCommand="{Binding ItemSelectedCommand}"
+                SelectionChangedCommandParameter="{Binding SelectedItem, Source={x:Reference DeviceListItemName}}"
+                SelectionMode="Single">
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate>
+                        <Yummy:PancakeView>
+                            <Yummy:PancakeView.Border>
+                                <Yummy:Border
+                                    DrawingStyle="Outside"
+                                    Thickness="2"
+                                    Color="DarkGray" />
+                            </Yummy:PancakeView.Border>
+                            <StackLayout>
+                                <Grid ColumnDefinitions="50*,20*, 10*">
+                                    <StackLayout
+                                        Grid.Column="0"
+                                        HorizontalOptions="Start"
+                                        Spacing="0">
+                                        <Label FontSize="14" Text="{Binding Name}" />
+                                    </StackLayout>
+                                    <StackLayout
+                                        Grid.Column="1"
+                                        HorizontalOptions="Start"
+                                        Spacing="0">
+                                        <Label FontSize="14" Text="{Binding State, Converter={StaticResource DeviceStateConverter}}" />
+                                    </StackLayout>
+                                    <StackLayout
+                                        Grid.Column="2"
+                                        HorizontalOptions="Start"
+                                        Spacing="0">
+                                        <Label FontSize="14" Text="{Binding Rssi, StringFormat='{0:d} dB'}" />
+                                    </StackLayout>
+                                </Grid>
+                            </StackLayout>
+                        </Yummy:PancakeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+        </StackLayout>
+    </ContentPage.Content>
+
+
+</ContentPage>

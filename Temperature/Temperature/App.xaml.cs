@@ -28,7 +28,7 @@ namespace Temperature
         {
             InitializeComponent();
 
-            var result =  await NavigationService.NavigateAsync("NavigationPage/MainPage");
+            var result =  await NavigationService.NavigateAsync("MainPage/NavigationPage/TitlePage");
 
             if (!result.Success)
             {
@@ -41,12 +41,16 @@ namespace Temperature
             containerRegistry.RegisterSingleton<IAppInfo, AppInfoImplementation>();
 
             containerRegistry.RegisterForNavigation<NavigationPage>();
-            containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
             containerRegistry.RegisterInstance(typeof(IUserDialogs), UserDialogs.Instance);
             containerRegistry.Register<IBluetoothService, BluetoothService>();
 
             containerRegistry.RegisterForNavigation<ServiceListPage, ServiceListPageViewModel>();
             containerRegistry.RegisterForNavigation<TemperatureSensorPage, TemperatureSensorPageViewModel>();
+
+            containerRegistry.RegisterForNavigation<MainPage, MainPageViewModel>();
+            containerRegistry.RegisterForNavigation<TitlePage, TitlePageViewModel>();
+            containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();
+            containerRegistry.RegisterForNavigation<HistoryPage, HistoryPageViewModel>();
 
         }
 
