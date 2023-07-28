@@ -19,11 +19,80 @@ using Temperature.Models;
 using Plugin.BLE.Abstractions.Extensions;
 using Plugin.BLE.Abstractions.EventArgs;
 using System.Collections;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 
 namespace Temperature.ViewModels
 {
     public class TemperatureSensorPageViewModel : ViewModelBase
     {
+        /// <summary>
+        /// For Temperature chart
+        /// </summary>
+        private ObservableCollection<double> _myChangedData;
+        public ObservableCollection<double> ChangedData
+        {
+            get { return _myChangedData; }
+            set { SetProperty(ref _myChangedData, value); }
+        }
+
+        private ObservableCollection<string> _dateTime;
+        public ObservableCollection<string> TimePoints
+        {
+            get { return _dateTime; }
+            set { SetProperty(ref _dateTime, value); }
+        }
+
+        private List<ISeries> _series;
+        public List<ISeries> Series
+        {
+            get { return _series; }
+            set { SetProperty(ref _series, value); }
+        }
+        private Axis _xaxe;
+        public Axis XAxe
+        {
+            get { return _xaxe; }
+            set { SetProperty(ref _xaxe, value); }
+        }
+
+        private List<Axis> _xaxes;
+        public List<Axis> XAxes
+        {
+            get { return _xaxes; }
+            set { SetProperty(ref _xaxes, value); }
+        }
+
+        private List<Axis> _yaxes;
+        public List<Axis> YAxes
+        {
+            get { return _yaxes; }
+            set { SetProperty(ref _yaxes, value); }
+        }
+
+        private LiveChartsCore.Measure.ZoomAndPanMode _zoomAndPanMode;
+        public LiveChartsCore.Measure.ZoomAndPanMode ZoomMode
+        {
+            get { return _zoomAndPanMode; }
+            set { SetProperty(ref _zoomAndPanMode, value); }
+        }
+
+        private double _maxlimit;
+        public double MaxLimit
+        {
+            get { return _maxlimit; }
+            set { SetProperty(ref _maxlimit, value); }
+        }
+
+        private double _minlimit;
+        public double MinLimit
+        {
+            get { return _minlimit; }
+            set { SetProperty(ref _minlimit, value); }
+        }
+
         private bool _updatesTemperatureStarted;
         //public double Temperature;
         private double _temperature;
@@ -91,7 +160,45 @@ namespace Temperature.ViewModels
             _adapterService = CrossBluetoothLE.Current.Adapter;
             _bluetoothLE = CrossBluetoothLE.Current;
 
+            //
+            ZoomMode = LiveChartsCore.Measure.ZoomAndPanMode.X;
+            MaxLimit = 0;
+            MinLimit = 0;
+            XAxe = new Axis
+            {
+                Name = "Time",
+                Labels = TimePoints,
+                LabelsRotation = 15,
+                MaxLimit = MaxLimit,
+                MinLimit = MinLimit,
+                Position = LiveChartsCore.Measure.AxisPosition.End
+            };
+            ChangedData = new ObservableCollection<double>();
+            TimePoints = new ObservableCollection<string>();
+            XAxes = new List<Axis>()
+            {
+                XAxe
+            };
+            YAxes = new List<Axis>()
+            {
+                new Axis
+                {
+                    Name = "Temp, °C",
+                    MaxLimit = 50,
+                    MinLimit = -10
+                }
+            };
+            Series = new List<ISeries> { };
 
+            Series.Add(new LineSeries<double>
+            {
+                Values = ChangedData,
+                LineSmoothness = 0.5,
+                Stroke = new LinearGradientPaint(new[] { new SKColor(255, 102, 102), new SKColor(153, 204, 255) },
+                new SKPoint(0.5f, 0),
+                new SKPoint(0.5f, 1))
+                { StrokeThickness = 10 },
+            });
         }
 
         private async Task Update()
@@ -267,7 +374,18 @@ namespace Temperature.ViewModels
 
         private void TemperatureOnValueUpdated(object sender, CharacteristicUpdatedEventArgs characteristicUpdatedEventArgs)
         {
-            Temperature = ConvertTemperature(characteristicUpdatedEventArgs.Characteristic.Value); 
+            Temperature = ConvertTemperature(characteristicUpdatedEventArgs.Characteristic.Value);
+
+            if (ChangedData.Count() >= 6)
+            {
+                MinLimit++;
+            }
+            ChangedData.Add((double)(Temperature));
+            TimePoints.Add(DateTime.Now.ToString("HH: mm:ss"));
+            MaxLimit++;
+            XAxe.MinLimit = MinLimit;
+            XAxe.MaxLimit = MaxLimit;
+            XAxe.Labels = TimePoints;
 
             Device.InvokeOnMainThreadAsync(() =>
             {
