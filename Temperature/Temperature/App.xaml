@@ -5,7 +5,7 @@
     xmlns:converters="clr-namespace:Temperature.Converters"
     xmlns:prism="http://prismlibrary.com">
     <Application.Resources>
-        <Color x:Key="PrimaryColor">#7E7D81</Color>
+        <Color x:Key="PrimaryColor">White</Color>
         <Color x:Key="AccentColor">#00A5F2</Color>
         <Color x:Key="TextColor">White</Color>
 

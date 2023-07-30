@@ -93,6 +93,7 @@ namespace Temperature.ViewModels
                     { "device", device }
                 };
                 var result = await NavigationService.NavigateAsync("NavigationPage/TemperatureSensorPage", navigationParams);
+                if(!result.Success) { UserDialogsService.Alert("Ошибка"); }
                 //await ExecuteScanCommand();
             }
             catch (OperationCanceledException e)

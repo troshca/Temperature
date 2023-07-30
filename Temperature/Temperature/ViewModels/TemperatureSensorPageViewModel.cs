@@ -23,6 +23,7 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
+using LiveChartsCore.SkiaSharpView.VisualElements;
 
 namespace Temperature.ViewModels
 {
@@ -93,6 +94,30 @@ namespace Temperature.ViewModels
             set { SetProperty(ref _minlimit, value); }
         }
 
+        /// <summary>
+        /// For Humidity chart
+        /// </summary>
+        private ObservableCollection<int> _myChangedDataHumidity;
+        public ObservableCollection<int> ChangedDataHumidity
+        {
+            get { return _myChangedDataHumidity; }
+            set { SetProperty(ref _myChangedDataHumidity, value); }
+        }
+
+        private ObservableCollection<string> _dateTimeHumidity;
+        public ObservableCollection<string> TimePointsHumidity
+        {
+            get { return _dateTimeHumidity; }
+            set { SetProperty(ref _dateTimeHumidity, value); }
+        }
+
+        private List<ISeries> _seriesHumidity;
+        public List<ISeries> SeriesHumidity
+        {
+            get { return _seriesHumidity; }
+            set { SetProperty(ref _seriesHumidity, value); }
+        }
+
         private bool _updatesTemperatureStarted;
         //public double Temperature;
         private double _temperature;
@@ -152,7 +177,7 @@ namespace Temperature.ViewModels
             _UpdateCommand ?? (_UpdateCommand = new DelegateCommand(async () => await Update()));
         //public MvxAsyncCommand ToggleUpdatesCommand => new MvxAsyncCommand((() => _updatesStarted ? StopUpdates() : StartUpdates()));
         public DelegateCommand ToggleUpdatesCommand => new DelegateCommand(async () => await Updates());
-            
+
 
 
         public TemperatureSensorPageViewModel(INavigationService navigationService, IUserDialogs userDialogsService) : base(navigationService, userDialogsService)
@@ -199,6 +224,16 @@ namespace Temperature.ViewModels
                 new SKPoint(0.5f, 1))
                 { StrokeThickness = 10 },
             });
+
+            //Humidity
+            ChangedDataHumidity = new ObservableCollection<int>();
+            SeriesHumidity = new List<ISeries> { };
+            SeriesHumidity.Add(new LineSeries<int>
+            {
+                Values = ChangedDataHumidity,
+                LineSmoothness = 0.5,
+            });
+            System.Diagnostics.Debug.WriteLine("Hello");
         }
 
         private async Task Update()
@@ -395,6 +430,9 @@ namespace Temperature.ViewModels
         private void HumidityOnValueUpdated(object sender, CharacteristicUpdatedEventArgs characteristicUpdatedEventArgs)
         {
             Humidity = characteristicUpdatedEventArgs.Characteristic.Value[0];
+            
+            ChangedDataHumidity.Add(Humidity);
+            
             Device.InvokeOnMainThreadAsync(() =>
             {
                 Messages.Insert(0, $"Humidity [{DateTime.Now.TimeOfDay}] - Updated: {Humidity}");

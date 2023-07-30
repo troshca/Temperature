@@ -7,7 +7,7 @@
             <StackLayout Grid.Row="1" 
                VerticalOptions="Center">
                 <Label Text="{Binding Temperature, StringFormat='Температура: {0:0.00}°C'}" FontSize="Large" HorizontalTextAlignment="Center"/>
-                <lc:CartesianChart 
+                <lc:CartesianChart
                         Series="{Binding Series}" 
                         XAxes="{Binding XAxes}" 
                         YAxes="{Binding YAxes}"
@@ -15,12 +15,9 @@
                         HeightRequest="400"
                         WidthRequest="300"/>
                 <Label Text="{Binding Humidity, StringFormat='Влажность: {0:d2}%'}" FontSize="Large" HorizontalTextAlignment="Center"/>
-                <lc:CartesianChart 
+                <lc:CartesianChart
                         Series="{Binding SeriesHumidity}" 
-                        XAxes="{Binding XAxesHumidity}" 
-                        YAxes="{Binding YAxesHumidity}"
-                        ZoomMode="{Binding ZoomModeHumidity}"
-                        HeightRequest="200"
+                        HeightRequest="400"
                         WidthRequest="300"/>
             </StackLayout>
             <StackLayout Grid.Row="3" Orientation="Horizontal" VerticalOptions="End"  HorizontalOptions="CenterAndExpand">
