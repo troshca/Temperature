@@ -4,13 +4,12 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:Yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
-    Title="{Binding Title}">
+    Title="Поиск датчика температуры">
     <ContentPage.Content>
         <StackLayout Margin="15" VerticalOptions="FillAndExpand">
-            <Button Command="{Binding ScanCommand}" Text="Сканировать" />
             <CollectionView
                 x:Name="DeviceListItemName"
-                BackgroundColor="WhiteSmoke"
+                BackgroundColor="White"
                 ItemsSource="{Binding DeviceList}"
                 SelectedItem="{Binding SelectedItem}"
                 SelectionChangedCommand="{Binding ItemSelectedCommand}"
@@ -18,42 +17,32 @@
                 SelectionMode="Single">
 
                 <CollectionView.ItemTemplate>
-
                     <DataTemplate>
                         <Yummy:PancakeView>
-                            <Yummy:PancakeView.Border>
-                                <Yummy:Border
-                                    DrawingStyle="Outside"
-                                    Thickness="2"
-                                    Color="DarkGray" />
-                            </Yummy:PancakeView.Border>
+
                             <StackLayout>
-                                <Grid ColumnDefinitions="50*,20*, 10*">
+                                <Grid ColumnDefinitions="50*, 20*">
                                     <StackLayout
                                         Grid.Column="0"
                                         HorizontalOptions="Start"
                                         Spacing="0">
-                                        <Label FontSize="14" Text="{Binding Name}" />
+                                        <Label FontSize="Large" Text="{Binding Name}" />
                                     </StackLayout>
                                     <StackLayout
                                         Grid.Column="1"
-                                        HorizontalOptions="Start"
+                                        HorizontalOptions="End"
                                         Spacing="0">
-                                        <Label FontSize="14" Text="{Binding State, Converter={StaticResource DeviceStateConverter}}" />
-                                    </StackLayout>
-                                    <StackLayout
-                                        Grid.Column="2"
-                                        HorizontalOptions="Start"
-                                        Spacing="0">
-                                        <Label FontSize="14" Text="{Binding Rssi, StringFormat='{0:d} dB'}" />
+                                        <Label FontSize="Medium"  Text="{Binding Rssi, StringFormat='{0:d} dB'}" />
                                     </StackLayout>
                                 </Grid>
                             </StackLayout>
                         </Yummy:PancakeView>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-
             </CollectionView>
+            
+            <Button Command="{Binding ScanCommand}" Text="Сканировать" />
+            <Button Command="{Binding ButtonConnectCommand}" Text="Подключиться" />
         </StackLayout>
     </ContentPage.Content>
 

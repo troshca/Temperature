@@ -118,6 +118,47 @@ namespace Temperature.ViewModels
             set { SetProperty(ref _seriesHumidity, value); }
         }
 
+        private Axis _xaxeHumidity;
+        public Axis XAxeHumidity
+        {
+            get { return _xaxeHumidity; }
+            set { SetProperty(ref _xaxeHumidity, value); }
+        }
+
+        private List<Axis> _xaxesHumidity;
+        public List<Axis> XAxesHumidity
+        {
+            get { return _xaxesHumidity; }
+            set { SetProperty(ref _xaxesHumidity, value); }
+        }
+
+        private List<Axis> _yaxesHumidity;
+        public List<Axis> YAxesHumidity
+        {
+            get { return _yaxesHumidity; }
+            set { SetProperty(ref _yaxesHumidity, value); }
+        }
+
+        private double _maxlimitHumidity;
+        public double MaxLimitHumidity
+        {
+            get { return _maxlimitHumidity; }
+            set { SetProperty(ref _maxlimitHumidity, value); }
+        }
+
+        private double _minlimitHumidity;
+        public double MinLimitHumidity
+        {
+            get { return _minlimitHumidity; }
+            set { SetProperty(ref _minlimitHumidity, value); }
+        }
+        private LiveChartsCore.Measure.ZoomAndPanMode _zoomAndPanModeHumidity;
+        public LiveChartsCore.Measure.ZoomAndPanMode ZoomModeHumidity
+        {
+            get { return _zoomAndPanModeHumidity; }
+            set { SetProperty(ref _zoomAndPanModeHumidity, value); }
+        }
+
         private bool _updatesTemperatureStarted;
         //public double Temperature;
         private double _temperature;
@@ -208,15 +249,14 @@ namespace Temperature.ViewModels
             {
                 new Axis
                 {
-                    Name = "Temp, °C",
-                    MaxLimit = 50,
-                    MinLimit = -10
+                    //Name = "Temp, °C",
                 }
             };
             Series = new List<ISeries> { };
 
             Series.Add(new LineSeries<double>
             {
+                Name = "Temp",
                 Values = ChangedData,
                 LineSmoothness = 0.5,
                 Stroke = new LinearGradientPaint(new[] { new SKColor(255, 102, 102), new SKColor(153, 204, 255) },
@@ -227,13 +267,37 @@ namespace Temperature.ViewModels
 
             //Humidity
             ChangedDataHumidity = new ObservableCollection<int>();
+            TimePointsHumidity = new ObservableCollection<string>();
+            MaxLimitHumidity = 0;
+            MinLimitHumidity = 0;
+            ZoomModeHumidity = LiveChartsCore.Measure.ZoomAndPanMode.X;
+            XAxeHumidity = new Axis
+            {
+                //Name = "Time",
+                Labels = TimePointsHumidity,
+                LabelsRotation = 15,
+                MaxLimit = MaxLimitHumidity,
+                MinLimit = MinLimitHumidity,
+                Position = LiveChartsCore.Measure.AxisPosition.End
+            };
+            XAxesHumidity = new List<Axis>()
+            {
+                XAxeHumidity
+            };
+            YAxesHumidity = new List<Axis>()
+            {
+                new Axis
+                {
+                    //Name = "Temp, °C",
+                }
+            };
             SeriesHumidity = new List<ISeries> { };
             SeriesHumidity.Add(new LineSeries<int>
             {
+                Name = "Humidity",
                 Values = ChangedDataHumidity,
                 LineSmoothness = 0.5,
             });
-            System.Diagnostics.Debug.WriteLine("Hello");
         }
 
         private async Task Update()
@@ -411,7 +475,7 @@ namespace Temperature.ViewModels
         {
             Temperature = ConvertTemperature(characteristicUpdatedEventArgs.Characteristic.Value);
 
-            if (ChangedData.Count() >= 6)
+            if (ChangedData.Count() >= 4)
             {
                 MinLimit++;
             }
@@ -430,9 +494,18 @@ namespace Temperature.ViewModels
         private void HumidityOnValueUpdated(object sender, CharacteristicUpdatedEventArgs characteristicUpdatedEventArgs)
         {
             Humidity = characteristicUpdatedEventArgs.Characteristic.Value[0];
-            
+
+            if (ChangedDataHumidity.Count() >= 4)
+            {
+                MinLimitHumidity++;
+            }
             ChangedDataHumidity.Add(Humidity);
-            
+            TimePointsHumidity.Add(DateTime.Now.ToString("HH: mm:ss"));
+            MaxLimitHumidity++;
+            XAxeHumidity.MinLimit = MinLimitHumidity;
+            XAxeHumidity.MaxLimit = MaxLimitHumidity;
+            XAxeHumidity.Labels = TimePointsHumidity;
+
             Device.InvokeOnMainThreadAsync(() =>
             {
                 Messages.Insert(0, $"Humidity [{DateTime.Now.TimeOfDay}] - Updated: {Humidity}");

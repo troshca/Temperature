@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:lc="clr-namespace:LiveChartsCore.SkiaSharpView.Xamarin.Forms;assembly=LiveChartsCore.SkiaSharpView.XamarinForms"
-             x:Class="Temperature.Views.TemperatureSensorPage">
+             x:Class="Temperature.Views.TemperatureSensorPage"
+             NavigationPage.HasNavigationBar="False"
+             Title="Температура и влажность">
     <ContentPage.Content>
         <StackLayout Margin="15">
             <StackLayout Grid.Row="1" 
@@ -13,12 +15,15 @@
                         YAxes="{Binding YAxes}"
                         ZoomMode="{Binding ZoomMode}"
                         HeightRequest="400"
-                        WidthRequest="300"/>
+                        WidthRequest="500"/>
                 <Label Text="{Binding Humidity, StringFormat='Влажность: {0:d2}%'}" FontSize="Large" HorizontalTextAlignment="Center"/>
                 <lc:CartesianChart
                         Series="{Binding SeriesHumidity}" 
+                        XAxes="{Binding XAxesHumidity}" 
+                        YAxes="{Binding YAxesHumidity}"
+                        ZoomMode="Both"
                         HeightRequest="400"
-                        WidthRequest="300"/>
+                        WidthRequest="500"/>
             </StackLayout>
             <StackLayout Grid.Row="3" Orientation="Horizontal" VerticalOptions="End"  HorizontalOptions="CenterAndExpand">
                 <Button Text="Обновить" Command="{Binding UpdateCommand}" />

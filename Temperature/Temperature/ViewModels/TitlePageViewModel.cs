@@ -22,7 +22,6 @@ namespace Temperature.ViewModels
         readonly IAdapter _adapterService;
         readonly IBluetoothLE _bluetoothLE;
 
-
         private List<IDevice> _deviceList;
 
         public List<IDevice> DeviceList
@@ -36,8 +35,21 @@ namespace Temperature.ViewModels
         public IDevice SelectedItem
         {
             get { return _selectedItem; }
-            set { SetProperty(ref _selectedItem, value); }
+            set 
+            { 
+                SetProperty(ref _selectedItem, value);
+                ButtonConnectCommand.RaiseCanExecuteChanged();
+            }
         }
+
+        private bool _executeScanCommand;
+        public bool ExecuteConnectButton
+        {
+            get { return _executeScanCommand; }
+            set { SetProperty(ref _executeScanCommand, value); }
+        }
+
+        public DelegateCommand ButtonConnectCommand { get; private set; }
 
         private DelegateCommand _scanCommand;
         public DelegateCommand ScanCommand =>
@@ -121,6 +133,26 @@ namespace Temperature.ViewModels
         {
             _adapterService = CrossBluetoothLE.Current.Adapter;
             _bluetoothLE = CrossBluetoothLE.Current;
+            ButtonConnectCommand = new DelegateCommand(Submit, CanSubmit);
+            //ExecuteConnectButton = false;
+            //ButtonConnectCommand = new DelegateCommand<IDevice>(ConnectCommandButton);
+        }
+
+        private bool CanSubmit()
+        {
+            if (SelectedItem == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;    
+            }
+        }
+
+        private void Submit()
+        {
+            ConnectCommand(SelectedItem);
         }
 
         public async override void OnNavigatedTo(INavigationParameters parameters)
@@ -133,5 +165,7 @@ namespace Temperature.ViewModels
             base.OnAppearing();
 
         }
+
+
     }
 }
